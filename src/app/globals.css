@@ -2309,6 +2309,10 @@ textarea {
   color: var(--danger);
   font-weight: 700;
 }
+.admin__note {
+  margin-top: 14px;
+  color: var(--cocoa-soft);
+}
 .admin__table-wrap {
   overflow-x: auto;
   border-radius: 18px;

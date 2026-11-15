@@ -1,5 +1,5 @@
 import { timingSafeEqual } from 'node:crypto';
-import { db, isEphemeralDb } from '@/lib/db';
+import { db, dbInfo, isEphemeralDb } from '@/lib/db';
 import { fail, json, rateLimit, readJson } from '@/lib/guard';
 
 export const runtime = 'nodejs';
@@ -34,6 +34,7 @@ export async function GET(req: Request) {
     ]);
     return json({
       ephemeral: isEphemeralDb(),
+      storage: dbInfo(),
       rsvps: rsvps.rows.map((r) => ({
         id: Number(r.id),
         name: String(r.name),

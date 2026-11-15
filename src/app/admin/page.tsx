@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 
 type Rsvp = { id: number; name: string; guests: number; note: string; createdAt: string };
 type Wish = { id: number; name: string; message: string; flavor: string; createdAt: string };
-type Data = { rsvps: Rsvp[]; wishes: Wish[]; ephemeral: boolean };
+type Data = { rsvps: Rsvp[]; wishes: Wish[]; ephemeral: boolean; storage?: { mode: string; envVar: string; host: string; hasToken: boolean } };
 
 const KEY = 'mochee:admin-key';
 const fmt = (iso: string) =>
@@ -117,6 +117,13 @@ export default function AdminPage() {
             <p className="admin__warn">
               Chưa kết nối Turso: dữ liệu đang nằm ở bộ nhớ tạm của Vercel và sẽ mất khi máy chủ khởi động lại. Hãy thêm
               TURSO_DATABASE_URL và TURSO_AUTH_TOKEN (xem README).
+            </p>
+          )}
+
+          {data.storage && (
+            <p className="admin__note">
+              Nơi lưu dữ liệu: <b>{data.storage.mode === 'turso' ? `Turso (${data.storage.host})` : data.storage.mode === 'local-file' ? 'file data/mochee.db trên máy' : 'bộ nhớ tạm của Vercel'}</b>
+              {data.storage.mode === 'turso' && !data.storage.hasToken && ' – thiếu TURSO_AUTH_TOKEN!'}
             </p>
           )}
 

@@ -41,6 +41,21 @@ Muốn dùng trang `/admin` ở local thì tạo file `.env.local` với một d
 
 > Chưa gắn Turso thì trang vẫn chạy, nhưng dữ liệu nằm ở bộ nhớ tạm `/tmp` của Vercel và **sẽ mất** khi máy chủ khởi động lại. Trang `/admin` sẽ hiện cảnh báo trong trường hợp này.
 
+### Kiểm tra đã nối Turso chưa
+
+Mở `https://<tên-miền>/api/health`:
+
+- `"mode": "turso"` – đã lưu vào Turso, dữ liệu giữ lâu dài.
+- `"mode": "vercel-tmp"` – Vercel **chưa** đưa biến Turso vào bản đang chạy: dữ liệu sẽ mất. Kiểm tra lại các bước dưới.
+
+Nếu dữ liệu "biến mất" sau khi gắn Turso:
+
+1. Dữ liệu gửi **trước** khi gắn Turso nằm ở bộ nhớ tạm của Vercel và đã mất, không khôi phục được. Database Turso mới tạo luôn trống.
+2. Sau khi thêm hoặc sửa biến môi trường phải **Redeploy** (Deployments → ⋯ → Redeploy); bản deploy cũ không tự nhận biến mới.
+3. Biến phải bật cho đúng môi trường (Production / Preview) của đường link anh đang mở. Link dạng `…-git-…vercel.app` là Preview.
+4. Mỗi lần "Create Database" là một database mới, trống. Chỉ giữ một database và connect nó vào project.
+5. Code tự nhận cả biến có tiền tố (vd. `STORAGE_TURSO_DATABASE_URL`), và `/admin` hiện đang lưu ở đâu.
+
 ## Sửa nội dung
 
 | Muốn đổi | Sửa ở |
