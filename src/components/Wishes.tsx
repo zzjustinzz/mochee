@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useId, useState } from 'react';
+import { PipingBag } from './Bakery';
 import { Icon, Mochi } from './Decor';
 import { flavors, type FlavorKey } from '@/lib/flavors';
 
@@ -106,6 +107,7 @@ export default function Wishes() {
 
   return (
     <section className="card wishes" id="loi-chuc" aria-labelledby="wishes-title">
+      <PipingBag className="card__sticker" />
       <p className="eyebrow">Sổ lưu bút của tiệm</p>
       <h2 id="wishes-title" className="card__title">
         Gửi lời chúc cho Mochee

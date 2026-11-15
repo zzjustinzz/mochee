@@ -33,9 +33,9 @@ export const links = {
   directions: `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(mapQuery)}&destination_place_id=${site.venue.placeId}`,
   googleCalendar:
     'https://calendar.google.com/calendar/render?action=TEMPLATE' +
-    `&text=${encodeURIComponent('Thôi nôi bé Mochee (An Vy)')}` +
+    `&text=${encodeURIComponent('Sinh nhật 1 tuổi bé Mochee (An Vy)')}` +
     '&dates=20261122T103000Z/20261122T140000Z' +
-    `&details=${encodeURIComponent('Tiệc thôi nôi bé Trần Đặng An Vy – ' + site.venue.hall)}` +
+    `&details=${encodeURIComponent('Tiệc sinh nhật đầu tiên của bé Trần Đặng An Vy – ' + site.venue.hall)}` +
     `&location=${encodeURIComponent(`${site.venue.name}, ${site.venue.address}`)}`,
-  ics: '/thoi-noi-mochee.ics',
+  ics: '/sinh-nhat-mochee.ics',
 };

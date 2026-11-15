@@ -1,10 +1,10 @@
-# Tiệm bánh Mochee – thiệp mời thôi nôi bé An Vy
+# Tiệm bánh Mochee – thiệp mời sinh nhật 1 tuổi bé An Vy
 
-Trang mời dự tiệc thôi nôi của bé **Trần Đặng An Vy (Mochee)** – 17:30, Chủ nhật 22/11/2026, Nhà hàng Hương Phố (sảnh Grand Ruby).
+Trang mời dự tiệc sinh nhật đầu tiên của bé **Trần Đặng An Vy (Mochee)** – 17:30, Chủ nhật 22/11/2026, Nhà hàng Hương Phố (sảnh Grand Ruby).
 
 - **Mở đầu:** mặt tiền tiệm bánh mochi, chạm vào cửa thì cửa mở và "bước vào" trang.
-- **Cột trái:** 20 tấm ảnh của bé xếp dọc. Trên quầy bánh dính ở đáy màn hình có bé Mochee 3D, cuộn tới đâu bé lớn tới đó: lật → trườn → bò → đứng → đi, tới chiếc bánh sinh nhật ở cuối quầy.
-- **Cột phải:** ảnh cận mặt bé, lời mời, đếm ngược, thời gian – địa điểm – bản đồ, form xác nhận tham dự, sổ lời chúc, album ảnh.
+- **Cột trái (hẹp, kiểu bếp bánh):** thanh treo dụng cụ, 20 tấm ảnh xếp dọc xen đồ làm bánh (phới, cây cán bột, túi bắt kem, cupcake, dango, vịt con…). Trên quầy bánh dính ở đáy màn hình có bé Mochee 3D (hoạt hình, viền sticker), cuộn tới đâu bé lớn tới đó: lật → trườn → bò → đứng → đi, tới chiếc bánh có nến số 1.
+- **Cột phải (phần chính):** dây cờ, ảnh cận mặt bé trên đĩa bánh, "Tiệc sinh nhật đầu tiên của Mochee", đếm ngược, phiếu hẹn kèm bản đồ, form xác nhận tham dự, sổ lời chúc, album ảnh.
 - **Điện thoại:** tự xếp thành một cột (thiệp mời → hành trình ảnh → xác nhận, lời chúc, album).
 - **`/admin`:** trang riêng cho ba mẹ xem danh sách khách, tải CSV, xoá lời chúc không phù hợp.
 
@@ -46,13 +46,14 @@ Muốn dùng trang `/admin` ở local thì tạo file `.env.local` với một d
 | Muốn đổi | Sửa ở |
 | --- | --- |
 | Tên bé, ngày giờ, địa điểm, link album | `src/lib/site.ts` |
-| File lịch tải về | `public/thoi-noi-mochee.ics` (giờ ghi theo UTC) |
+| File lịch tải về | `public/sinh-nhat-mochee.ics` (giờ ghi theo UTC) |
 | Danh sách 20 ảnh, tên các "mẻ bánh", mô tả ảnh | `src/lib/photos.ts` |
 | Ảnh lấy thêm từ album Shotpik | `src/lib/album.ts` (xoá dòng nào thì ảnh đó không hiện) |
 | Lời mời, tiêu đề | `src/app/page.tsx` |
 | Màu sắc, cỡ chữ | biến `--…` ở đầu `src/app/globals.css` |
-| Dáng điệu, tốc độ của bé 3D | các hàm `supine`, `prone`, `commando`, `crawl`, `stand`, `walk`, `cheer` trong `src/three/mocheeStage.ts` |
-| Mốc chuyển chặng (lật/trườn/bò/đứng/đi) | `src/three/milestones.ts` và hàm `poseAt` trong `mocheeStage.ts` |
+| Dáng điệu, tốc độ của bé 3D | các hàm `supine`, `prone`, `commando`, `crawl`, `stand`, `walk`, `cheer` và `poseAt` trong `src/three/poses.ts` |
+| Hình dáng, màu áo, giày, bánh của cảnh 3D | `src/three/mocheeStage.ts` |
+| Mốc chuyển chặng (lật/trườn/bò/đứng/đi) | `src/three/milestones.ts` và hàm `poseAt` trong `poses.ts` |
 
 ### Thay ảnh
 
@@ -77,9 +78,10 @@ src/
     api/rsvp/           POST xác nhận tham dự · GET tổng số khách
     api/wishes/         GET/POST lời chúc (phân trang)
     api/admin/          GET toàn bộ dữ liệu · DELETE một dòng (cần ADMIN_KEY)
-  components/           Intro, Journey, BabyStage, Countdown, PartyInfo, RsvpForm, Wishes, Album, Lightbox, Decor
+  components/           Intro, Journey, BabyStage, Countdown, PartyInfo, RsvpForm, Wishes, Album, Lightbox,
+                        Decor (vịt, mochi, icon), Bakery (đồ làm bánh vẽ bằng SVG)
   lib/                  site (thông tin tiệc), photos, album, db (SQLite), guard (kiểm tra dữ liệu, chống spam)
-  three/                mocheeStage (bé 3D + vịt + bánh), milestones
+  three/                mocheeStage (bé 3D + vịt + bánh), poses (tư thế), milestones
 public/                 ảnh, ảnh chia sẻ og.jpg, file lịch .ics
 ```
 

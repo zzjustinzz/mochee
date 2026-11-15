@@ -6,6 +6,7 @@
  * nằm ngửa → LẬT → TRƯỜN → BÒ → ĐỨNG → ĐI → reo mừng bên chiếc bánh mochi.
  */
 import * as THREE from 'three';
+import { clamp01, cos, DEG, lerp, poseAt, sin, smooth, type Pose } from './poses';
 
 export type MocheeStage = {
   resize(width: number, height: number): void;
@@ -13,126 +14,6 @@ export type MocheeStage = {
   /** Điểm ngay bên trái đầu bé lúc về đích, tính theo tỉ lệ 0–1 của khung (để đặt bong bóng thoại). */
   anchor(): { x: number; y: number };
   dispose(): void;
-};
-
-/* ───────────────────────── tiện ích ───────────────────────── */
-
-const DEG = Math.PI / 180;
-const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
-const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
-const smooth = (a: number, b: number, x: number) => {
-  const t = clamp01((x - a) / (b - a));
-  return t * t * (3 - 2 * t);
-};
-const up = (x: number) => Math.max(0, x);
-
-/** Tư thế = bộ góc khớp (độ) + độ cao hông. Trái = phía +X của bé. */
-type Pose = {
-  y: number; // độ cao hông
-  pitch: number; // gập người về trước (90 = nằm sấp)
-  roll: number; // xoay quanh sống lưng (180 = nằm ngửa)
-  lean: number; // nghiêng trái/phải
-  yaw: number; // hướng nhìn của cả người
-  chest: number;
-  hx: number; hy: number; hz: number; // đầu
-  sLx: number; sLz: number; eL: number; // vai + khuỷu trái
-  sRx: number; sRz: number; eR: number;
-  hLx: number; hLz: number; kL: number; // hông + gối trái
-  hRx: number; hRz: number; kR: number;
-};
-
-const POSE_KEYS = [
-  'y', 'pitch', 'roll', 'lean', 'yaw', 'chest', 'hx', 'hy', 'hz',
-  'sLx', 'sLz', 'eL', 'sRx', 'sRz', 'eR', 'hLx', 'hLz', 'kL', 'hRx', 'hRz', 'kR',
-] as const;
-
-function mix(a: Pose, b: Pose, t: number): Pose {
-  if (t <= 0) return a;
-  if (t >= 1) return b;
-  const out = {} as Pose;
-  for (const k of POSE_KEYS) out[k] = lerp(a[k], b[k], t);
-  return out;
-}
-
-/* ───────────────────────── các tư thế ───────────────────────── */
-
-const sin = Math.sin;
-const cos = Math.cos;
-
-/** Nằm ngửa, đạp chân, quơ tay. */
-const supine = (ph: number, t: number): Pose => ({
-  y: 0.25, pitch: 72, roll: -180, lean: 0, yaw: 108, chest: 0,
-  hx: 14, hy: 42 + 10 * sin(t * 0.9), hz: 0,
-  sLx: -78 + 16 * sin(ph * 2), sLz: 42, eL: -58,
-  sRx: -78 - 16 * sin(ph * 2), sRz: -42, eR: -58,
-  hLx: -82 + 22 * sin(ph * 2 + 0.6), hLz: 24, kL: 74 - 22 * sin(ph * 2 + 0.6),
-  hRx: -82 - 22 * sin(ph * 2 + 0.6), hRz: -24, kR: 74 + 22 * sin(ph * 2 + 0.6),
-});
-
-/** Nằm sấp, chống tay ngẩng đầu. */
-const prone = (ph: number, t: number): Pose => ({
-  y: 0.25, pitch: 78, roll: 0, lean: 0, yaw: 62, chest: -14,
-  hx: -62, hy: -18 + 6 * sin(t * 1.1), hz: 0,
-  sLx: -128, sLz: 20, eL: -52,
-  sRx: -128, sRz: -20, eR: -52,
-  hLx: 6, hLz: 16, kL: 26 + 24 * sin(ph * 2),
-  hRx: 6, hRz: -16, kR: 26 - 24 * sin(ph * 2),
-});
-
-/** Trườn: bụng sát sàn, tay kéo – chân ếch đạp. */
-const commando = (ph: number): Pose => ({
-  y: 0.25, pitch: 83, roll: 9 * sin(ph), lean: 0, yaw: 62 + 5 * sin(ph), chest: -10,
-  hx: -64, hy: -16 - 6 * sin(ph), hz: 4 * sin(ph),
-  sLx: -128 - 30 * sin(ph), sLz: 22, eL: -46 + 26 * sin(ph),
-  sRx: -128 + 30 * sin(ph), sRz: -22, eR: -46 - 26 * sin(ph),
-  hLx: -28 + 26 * sin(ph), hLz: 34, kL: 62 - 30 * sin(ph),
-  hRx: -28 - 26 * sin(ph), hRz: -34, kR: 62 + 30 * sin(ph),
-});
-
-/** Bò bằng tay và gối – tay trái đi cùng chân phải. */
-const crawl = (ph: number): Pose => ({
-  y: 0.31 + 0.012 * sin(ph * 2), pitch: 76, roll: 5 * sin(ph), lean: 0, yaw: 60 + 4 * sin(ph), chest: 0,
-  hx: -66, hy: -14 + 7 * sin(ph), hz: 3 * sin(ph),
-  sLx: -76 - 24 * sin(ph), sLz: 7, eL: -34 * up(cos(ph)),
-  sRx: -76 + 24 * sin(ph), sRz: -7, eR: -34 * up(-cos(ph)),
-  hLx: -76 + 20 * sin(ph), hLz: 8, kL: 92 + 14 * up(-cos(ph)),
-  hRx: -76 - 20 * sin(ph), hRz: -8, kR: 92 + 14 * up(cos(ph)),
-});
-
-/** Đứng chựng: dang tay giữ thăng bằng, nhún nhún đầu gối. */
-const stand = (t: number): Pose => {
-  const bounce = 0.5 + 0.5 * sin(t * 3.2);
-  return {
-    y: 0.47 - 0.012 * bounce, pitch: 3 + 2 * sin(t * 1.3), roll: 0, lean: 4 * sin(t * 1.7), yaw: 28, chest: 0,
-    hx: -4, hy: 0, hz: 4 * sin(t * 1.7 + 0.5),
-    sLx: -22, sLz: 58 + 8 * sin(t * 2.1), eL: -28,
-    sRx: -22, sRz: -58 + 8 * sin(t * 2.1 + 1), eR: -28,
-    hLx: -6 - 6 * bounce, hLz: 9, kL: 8 + 12 * bounce,
-    hRx: -6 - 6 * bounce, hRz: -9, kR: 8 + 12 * bounce,
-  };
-};
-
-/** Chập chững đi: lắc lư, tay giơ cao. */
-const walk = (ph: number): Pose => ({
-  y: 0.465 + 0.022 * Math.abs(sin(ph)), pitch: 5, roll: 9 * sin(ph), lean: 5 * cos(ph), yaw: 48, chest: 0,
-  hx: -6, hy: -10, hz: 5 * cos(ph),
-  sLx: -34 + 12 * sin(ph), sLz: 64, eL: -72,
-  sRx: -34 - 12 * sin(ph), sRz: -64, eR: -72,
-  hLx: -5 - 27 * sin(ph), hLz: 7, kL: 8 + 34 * up(cos(ph)),
-  hRx: -5 + 27 * sin(ph), hRz: -7, kR: 8 + 34 * up(-cos(ph)),
-});
-
-/** Tới nơi: giơ hai tay reo mừng. */
-const cheer = (t: number): Pose => {
-  const hop = Math.abs(sin(t * 4.2));
-  return {
-    y: 0.455 + 0.07 * hop, pitch: 0, roll: 0, lean: 3 * sin(t * 4.2), yaw: 16, chest: 0,
-    hx: -10, hy: 0, hz: 5 * sin(t * 2.1),
-    sLx: -30, sLz: 122 + 10 * sin(t * 8.4), eL: -8,
-    sRx: -30, sRz: -122 - 10 * sin(t * 8.4), eR: -8,
-    hLx: -8 + 6 * hop, hLz: 10, kL: 16 - 12 * hop,
-    hRx: -8 + 6 * hop, hRz: -10, kR: 16 - 12 * hop,
-  };
 };
 
 /* ───────────────────────── dựng hình ───────────────────────── */
@@ -212,28 +93,58 @@ export function createMocheeStage(canvas: HTMLCanvasElement): MocheeStage {
     return { xCake, xStart, xEnd: xCake - 1.14 };
   };
 
-  /* vật liệu */
-  const mat = (color: number, extra: THREE.MeshStandardMaterialParameters = {}) =>
-    track(new THREE.MeshStandardMaterial({ color, roughness: 0.8, metalness: 0, ...extra }));
+  /* vật liệu hoạt hình: đổ bóng theo 4 nấc mềm + viền nâu cacao như sticker */
+  const toonRamp = track(new THREE.DataTexture(new Uint8Array([150, 196, 232, 255]), 4, 1, THREE.RedFormat));
+  toonRamp.minFilter = toonRamp.magFilter = THREE.NearestFilter;
+  toonRamp.needsUpdate = true;
+  const mat = (color: number, extra: THREE.MeshToonMaterialParameters = {}) =>
+    track(new THREE.MeshToonMaterial({ color, gradientMap: toonRamp, ...extra }));
+  const flat = (color: number, extra: THREE.MeshBasicMaterialParameters = {}) =>
+    track(new THREE.MeshBasicMaterial({ color, ...extra }));
+
+  // viền: vẽ lại mặt sau của khối, đẩy ra theo pháp tuyến trong không gian camera (dày đều, không phụ thuộc tỉ lệ)
+  const outlineMat = track(
+    new THREE.ShaderMaterial({
+      uniforms: { thickness: { value: 0.022 }, color: { value: new THREE.Color(0x5b3a1e) } },
+      vertexShader: `uniform float thickness;
+        void main() {
+          vec4 mv = modelViewMatrix * vec4(position, 1.0);
+          vec3 n = normalize(normalMatrix * normal);
+          mv.xyz += n * thickness;
+          gl_Position = projectionMatrix * mv;
+        }`,
+      fragmentShader: `uniform vec3 color; void main() { gl_FragColor = vec4(color, 1.0); }`,
+      side: THREE.BackSide,
+    }),
+  );
+  const outlined = <T extends THREE.Mesh>(m: T): T => {
+    m.add(new THREE.Mesh(m.geometry, outlineMat));
+    return m;
+  };
   const gingham = track(ginghamTexture());
   const M = {
-    skin: mat(0xffe0c8),
-    skinDark: mat(0xf3bfa2),
-    hair: mat(0x2c1d17, { roughness: 0.95 }),
-    cream: mat(0xfff4dc),
+    skin: mat(0xffe3cf),
+    skinDark: mat(0xf2b79a),
+    hair: mat(0x3a2519),
+    cream: mat(0xfff6e2),
     romper: mat(0xffffff, { map: gingham }),
     yellow: mat(0xffd84a),
+    shoe: mat(0xffc928),
     white: mat(0xffffff),
-    eye: mat(0x2a1a14, { roughness: 0.35 }),
-    blush: mat(0xff9d9d, { transparent: true, opacity: 0.55, depthWrite: false }),
-    mouth: mat(0xd9606a),
-    gold: mat(0xf2c14e, { roughness: 0.4, metalness: 0.5 }),
+    eye: flat(0x2a1a14),
+    shine: flat(0xffffff),
+    blush: flat(0xff9aa2, { transparent: true, opacity: 0.6, depthWrite: false }),
+    mouth: flat(0xc94a5a),
+    tongue: flat(0xff8f9c),
+    stripe: flat(0x3a2519),
+    gold: mat(0xf2c14e),
     duck: mat(0xffd23f),
     beak: mat(0xff9a3c),
     pink: mat(0xffc7cf),
-    berry: mat(0xff6b6b),
+    berry: mat(0xff5f6d),
     leaf: mat(0x8fcf7a),
-    flame: mat(0xffb23f, { emissive: 0xff8a1f, emissiveIntensity: 1.2 }),
+    flame: flat(0xffc23f),
+    glow: flat(0xffe9a6, { transparent: true, opacity: 0.45, depthWrite: false }),
   };
 
   const geo = {
@@ -256,8 +167,10 @@ export function createMocheeStage(canvas: HTMLCanvasElement): MocheeStage {
   scene.add(root);
 
   // quần phồng + thân áo caro vàng
-  pelvis.add(at(ball(0.255, M.romper, 1.06, 0.82, 0.98), 0, 0.06, 0));
-  pelvis.add(at(ball(0.29, M.romper, 1, 1.02, 0.9), 0, 0.25, 0.005));
+  pelvis.add(at(outlined(ball(0.255, M.romper, 1.06, 0.82, 0.98)), 0, 0.06, 0));
+  pelvis.add(at(outlined(ball(0.29, M.romper, 1, 1.02, 0.9)), 0, 0.25, 0.005));
+  // 3 cúc áo nhỏ
+  for (const y of [0.33, 0.25, 0.17]) pelvis.add(at(ball(0.022, M.cream, 1, 1, 0.5, true), 0, y, 0.262));
 
   const chest = at(new THREE.Group(), 0, 0.4, 0);
   pelvis.add(chest);
@@ -267,7 +180,7 @@ export function createMocheeStage(canvas: HTMLCanvasElement): MocheeStage {
   collar.scale.set(1.1, 1, 0.55);
   chest.add(at(collar, 0, 0.07, 0.01));
   for (const s of [-1, 1]) {
-    const ruffle = ball(0.15, M.yellow, 1.15, 0.42, 1.1);
+    const ruffle = outlined(ball(0.15, M.yellow, 1.15, 0.42, 1.1));
     ruffle.rotation.z = -s * 0.5;
     chest.add(at(ruffle, s * 0.25, 0.04, 0));
     const lace = ball(0.165, M.cream, 1.15, 0.2, 1.1);
@@ -284,20 +197,35 @@ export function createMocheeStage(canvas: HTMLCanvasElement): MocheeStage {
   ): Limb => {
     const a = at(new THREE.Group(), x, y, 0);
     parent.add(a);
-    a.add(at(capsule(r1, l1, m1), 0, -l1 / 2, 0));
+    a.add(at(outlined(capsule(r1, l1, m1)), 0, -l1 / 2, 0));
     const b = at(new THREE.Group(), 0, -l1, 0);
     a.add(b);
-    b.add(at(capsule(r2, l2, m2), 0, -l2 / 2, 0));
+    b.add(at(outlined(capsule(r2, l2, m2)), 0, -l2 / 2, 0));
     b.add(end);
     return { a, b };
   };
 
-  const hand = () => at(ball(0.078, M.skin), 0, -0.19, 0);
-  const foot = () => at(ball(0.098, M.white, 0.95, 0.78, 1.32), 0, -0.2, 0.035);
+  const hand = () => at(outlined(ball(0.078, M.skin)), 0, -0.19, 0);
+  // giày thể thao vàng sọc đen (như đôi giày trong ảnh chụp gia đình) + đế trắng
+  const foot = () => {
+    const g = at(new THREE.Group(), 0, -0.2, 0.035);
+    g.add(outlined(ball(0.1, M.shoe, 0.95, 0.74, 1.34)));
+    g.add(at(outlined(ball(0.1, M.white, 1.0, 0.3, 1.38)), 0, -0.05, 0));
+    for (const s of [-1, 1]) {
+      const st = ball(0.05, M.stripe, 0.18, 0.28, 1.2, true);
+      st.rotation.x = 0.5;
+      g.add(at(st, s * 0.088, 0.005, 0.01));
+    }
+    return g;
+  };
   const armL = limb(chest, 0.265, 0.03, 0.074, 0.17, M.skin, 0.068, 0.15, M.skin, hand());
   const armR = limb(chest, -0.265, 0.03, 0.074, 0.17, M.skin, 0.068, 0.15, M.skin, hand());
   const legL = limb(pelvis, 0.135, -0.02, 0.105, 0.2, M.skin, 0.088, 0.17, M.white, foot());
   const legR = limb(pelvis, -0.135, -0.02, 0.105, 0.2, M.skin, 0.088, 0.17, M.white, foot());
+  // vòng tay vàng (bé đeo trong ảnh)
+  const bangle = new THREE.Mesh(track(new THREE.TorusGeometry(0.072, 0.014, 8, 24)), M.gold);
+  bangle.rotation.x = Math.PI / 2;
+  armL.b.add(at(bangle, 0, -0.12, 0));
   // viền bèo ống quần
   for (const leg of [legL, legR]) {
     const cuff = new THREE.Mesh(track(new THREE.TorusGeometry(0.1, 0.035, 8, 20)), M.yellow);
@@ -311,9 +239,9 @@ export function createMocheeStage(canvas: HTMLCanvasElement): MocheeStage {
   const head = at(new THREE.Group(), 0, 0.37, 0.01);
   neck.add(head);
   const HR = 0.44;
-  head.add(ball(HR, M.skin, 1.06, 0.97, 1));
+  head.add(outlined(ball(HR, M.skin, 1.06, 0.97, 1)));
   // má bánh bao
-  for (const s of [-1, 1]) head.add(at(ball(0.2, M.skin, 1, 0.9, 0.95), s * 0.215, -0.15, 0.125));
+  for (const s of [-1, 1]) head.add(at(outlined(ball(0.2, M.skin, 1, 0.9, 0.95)), s * 0.215, -0.15, 0.125));
 
   // tóc: chỏm tóc đen ôm đỉnh đầu + mái lưa thưa
   const hairCap = new THREE.Mesh(
@@ -322,7 +250,11 @@ export function createMocheeStage(canvas: HTMLCanvasElement): MocheeStage {
   );
   hairCap.scale.set(1.06, 0.99, 1.02);
   hairCap.rotation.x = -29 * DEG;
-  head.add(hairCap);
+  head.add(outlined(hairCap));
+  // lọn tóc xoăn trên đỉnh – "chỏm mochi"
+  const curl = new THREE.Mesh(track(new THREE.TorusGeometry(0.075, 0.026, 10, 24, Math.PI * 1.55)), M.hair);
+  curl.rotation.set(0, Math.PI / 2, -0.4);
+  head.add(at(outlined(curl), 0, HR * 1.04 + 0.06, -0.03));
   const bangs: [number, number, number, number][] = [
     [-0.23, 0.262, 0.285, 0.75], [-0.11, 0.315, 0.315, 0.3], [0.02, 0.33, 0.315, -0.1], [0.14, 0.31, 0.31, -0.4], [0.25, 0.25, 0.275, -0.85],
   ];
@@ -335,9 +267,13 @@ export function createMocheeStage(canvas: HTMLCanvasElement): MocheeStage {
   // khuôn mặt
   const eyes: THREE.Group[] = [];
   for (const s of [-1, 1]) {
-    const eye = at(new THREE.Group(), s * 0.165, -0.015, 0.398);
-    eye.add(ball(0.056, M.eye, 1, 1.2, 0.55));
-    eye.add(at(ball(0.019, M.white, 1, 1, 0.6, true), 0.018, 0.026, 0.029));
+    const eye = at(new THREE.Group(), s * 0.165, -0.02, 0.395);
+    eye.add(ball(0.066, M.eye, 1, 1.2, 0.5));
+    eye.add(at(ball(0.024, M.shine, 1, 1, 0.5, true), 0.02, 0.032, 0.03));
+    eye.add(at(ball(0.011, M.shine, 1, 1, 0.5, true), -0.024, -0.03, 0.03));
+    const lash = ball(0.026, M.eye, 1.4, 0.4, 0.4, true);
+    lash.rotation.z = s * 0.5;
+    eye.add(at(lash, s * 0.062, 0.05, 0.004));
     eye.rotation.y = s * 0.36;
     head.add(eye);
     eyes.push(eye);
@@ -347,14 +283,20 @@ export function createMocheeStage(canvas: HTMLCanvasElement): MocheeStage {
     const blush = ball(0.085, M.blush, 1, 0.68, 0.3, true);
     blush.rotation.y = s * 0.62;
     head.add(at(blush, s * 0.29, -0.135, 0.318));
-    head.add(at(ball(0.075, M.skin, 0.5, 1, 0.8, true), s * 0.455, -0.03, 0.0)); // tai
+    head.add(at(outlined(ball(0.075, M.skin, 0.5, 1, 0.8, true)), s * 0.455, -0.03, 0.0)); // tai
     head.add(at(ball(0.016, M.gold, 1, 1, 1, true), s * 0.47, -0.1, 0.01)); // khuyên tai
   }
   head.add(at(ball(0.024, M.skinDark, 1.1, 0.8, 0.8, true), 0, -0.075, 0.445));
-  const smile = new THREE.Mesh(track(new THREE.TorusGeometry(0.058, 0.015, 8, 18, Math.PI)), M.mouth);
-  smile.rotation.z = Math.PI;
-  smile.rotation.x = -0.2;
-  head.add(at(smile, 0, -0.135, 0.418));
+  // miệng cười hé + lưỡi hồng thè ra (như ảnh JOY_3892)
+  const mouthG = at(new THREE.Group(), 0, -0.13, 0.428);
+  mouthG.rotation.x = -0.32;
+  const mouth = new THREE.Mesh(track(new THREE.CircleGeometry(0.06, 24, Math.PI, Math.PI)), M.mouth);
+  mouth.scale.set(1.15, 0.85, 1);
+  mouthG.add(mouth);
+  const tongue = new THREE.Mesh(track(new THREE.CircleGeometry(0.034, 20)), M.tongue);
+  tongue.scale.set(1.2, 0.8, 1);
+  mouthG.add(at(tongue, 0, -0.042, 0.002));
+  head.add(mouthG);
 
   // băng đô nơ kem
   const band = new THREE.Group();
@@ -369,11 +311,11 @@ export function createMocheeStage(canvas: HTMLCanvasElement): MocheeStage {
     const bow = at(new THREE.Group(), HR * 1.13 * cos(a), HR * 1.06 * sin(a), 0.01);
     bow.rotation.z = a + Math.PI / 2;
     for (const s of [-1, 1]) {
-      const wing = ball(0.1, M.cream, 1, 0.68, 0.5, true);
+      const wing = outlined(ball(0.1, M.cream, 1, 0.68, 0.5, true));
       wing.rotation.z = s * 0.25;
       bow.add(at(wing, s * 0.095, 0.012, 0));
     }
-    bow.add(ball(0.045, M.cream, 1, 1, 0.9, true));
+    bow.add(outlined(ball(0.045, M.cream, 1, 1, 0.9, true)));
     band.add(bow);
   }
 
@@ -381,43 +323,63 @@ export function createMocheeStage(canvas: HTMLCanvasElement): MocheeStage {
   const duck = new THREE.Group();
   const duckBody = new THREE.Group();
   duck.add(duckBody);
-  duckBody.add(at(ball(0.19, M.duck, 1.05, 0.92, 1.2), 0, 0.19, 0));
-  duckBody.add(at(ball(0.135, M.duck), 0, 0.42, 0.13));
-  duckBody.add(at(ball(0.062, M.beak, 1.05, 0.42, 1.15, true), 0, 0.4, 0.27));
+  duckBody.add(at(outlined(ball(0.19, M.duck, 1.05, 0.92, 1.2)), 0, 0.19, 0));
+  duckBody.add(at(outlined(ball(0.135, M.duck)), 0, 0.42, 0.13));
+  duckBody.add(at(outlined(ball(0.062, M.beak, 1.05, 0.42, 1.15, true)), 0, 0.4, 0.27));
+  // nơ hồng trên cổ vịt
+  for (const s of [-1, 1]) duckBody.add(at(outlined(ball(0.05, M.pink, 1, 0.7, 0.5, true)), s * 0.05, 0.31, 0.2));
   for (const s of [-1, 1]) {
-    duckBody.add(at(ball(0.02, M.eye, 1, 1, 1, true), s * 0.07, 0.455, 0.235));
-    const wing = ball(0.1, M.duck, 0.35, 0.7, 1.05, true);
+    duckBody.add(at(ball(0.022, M.eye, 1, 1.2, 1, true), s * 0.07, 0.455, 0.235));
+    duckBody.add(at(ball(0.03, M.blush, 1, 0.7, 0.4, true), s * 0.1, 0.41, 0.215));
+    const wing = outlined(ball(0.1, M.duck, 0.35, 0.7, 1.05, true));
     duckBody.add(at(wing, s * 0.19, 0.2, -0.02));
     duck.add(at(ball(0.05, M.beak, 1, 0.3, 1.4, true), s * 0.08, 0.015, 0.05));
   }
-  const tail = ball(0.07, M.duck, 0.8, 0.8, 1.2, true);
+  const tail = outlined(ball(0.07, M.duck, 0.8, 0.8, 1.2, true));
   tail.rotation.x = -0.7;
   duckBody.add(at(tail, 0, 0.27, -0.22));
   scene.add(duck);
 
-  /* ── chiếc bánh mochi sinh nhật ở cuối quầy ── */
+  /* ── chiếc bánh mochi sinh nhật ở cuối quầy: 3 tầng, viền kem, dâu, nến số 1 ── */
   const cake = new THREE.Group();
-  const plate = new THREE.Mesh(track(new THREE.CylinderGeometry(0.6, 0.52, 0.05, 40)), M.white);
-  cake.add(at(plate, 0, 0.025, 0));
-  cake.add(at(ball(0.46, M.cream, 1.14, 0.66, 1.14), 0, 0.3, 0));
-  cake.add(at(ball(0.33, M.pink, 1.12, 0.64, 1.12), 0, 0.66, 0));
-  cake.add(at(ball(0.21, M.yellow, 1.1, 0.7, 1.1), 0, 0.93, 0));
+  const plate = outlined(new THREE.Mesh(track(new THREE.CylinderGeometry(0.62, 0.54, 0.06, 40)), M.white));
+  cake.add(at(plate, 0, 0.03, 0));
+  cake.add(at(outlined(ball(0.46, M.cream, 1.14, 0.66, 1.14)), 0, 0.3, 0));
+  cake.add(at(outlined(ball(0.33, M.pink, 1.12, 0.64, 1.12)), 0, 0.66, 0));
+  cake.add(at(outlined(ball(0.21, M.yellow, 1.1, 0.7, 1.1)), 0, 0.93, 0));
+  // viền kem trắng giữa các tầng
+  for (const [y, r] of [[0.5, 0.36], [0.83, 0.23]] as const) {
+    const rim = outlined(new THREE.Mesh(track(new THREE.TorusGeometry(r, 0.045, 10, 36)), M.cream));
+    rim.rotation.x = Math.PI / 2;
+    cake.add(at(rim, 0, y, 0));
+  }
   // mặt cười của bánh
   for (const s of [-1, 1]) {
-    cake.add(at(ball(0.026, M.eye, 1, 1.2, 0.6, true), s * 0.13, 0.36, 0.5));
-    cake.add(at(ball(0.05, M.blush, 1, 0.6, 0.3, true), s * 0.24, 0.3, 0.47));
+    cake.add(at(ball(0.03, M.eye, 1, 1.2, 0.6, true), s * 0.13, 0.36, 0.5));
+    cake.add(at(ball(0.012, M.shine, 1, 1, 0.6, true), s * 0.13 + 0.01, 0.375, 0.52));
+    cake.add(at(ball(0.055, M.blush, 1, 0.6, 0.3, true), s * 0.24, 0.3, 0.47));
   }
-  const cakeSmile = new THREE.Mesh(track(new THREE.TorusGeometry(0.04, 0.012, 8, 14, Math.PI)), M.mouth);
-  cakeSmile.rotation.z = Math.PI;
-  cake.add(at(cakeSmile, 0, 0.32, 0.515));
-  const candle = new THREE.Mesh(track(new THREE.CylinderGeometry(0.03, 0.03, 0.26, 14)), M.white);
-  cake.add(at(candle, 0, 1.17, 0));
+  const cakeMouth = new THREE.Mesh(track(new THREE.CircleGeometry(0.04, 18, Math.PI, Math.PI)), M.mouth);
+  cake.add(at(cakeMouth, 0, 0.32, 0.522));
+  // nến hình số 1
+  const one = new THREE.Group();
+  const stem = outlined(new THREE.Mesh(track(new THREE.BoxGeometry(0.1, 0.36, 0.08)), M.pink));
+  one.add(at(stem, 0, 0.18, 0));
+  const flag = outlined(new THREE.Mesh(track(new THREE.BoxGeometry(0.1, 0.07, 0.08)), M.pink));
+  flag.rotation.z = 0.7;
+  one.add(at(flag, -0.06, 0.32, 0));
+  for (const y of [0.08, 0.18, 0.28]) one.add(at(new THREE.Mesh(track(new THREE.BoxGeometry(0.104, 0.03, 0.084)), M.white), 0, y, 0));
+  const wick = new THREE.Mesh(track(new THREE.CylinderGeometry(0.008, 0.008, 0.05, 6)), M.stripe);
+  one.add(at(wick, 0, 0.385, 0));
+  cake.add(at(one, 0, 1.02, 0));
   const flame = ball(0.05, M.flame, 0.8, 1.35, 0.8, true);
-  cake.add(at(flame, 0, 1.36, 0));
-  cake.add(at(ball(0.07, M.berry, 1, 1.1, 1, true), 0.2, 0.92, 0.2));
-  cake.add(at(ball(0.035, M.leaf, 1.3, 0.4, 1.3, true), 0.2, 0.995, 0.2));
-  cake.add(at(ball(0.07, M.berry, 1, 1.1, 1, true), -0.3, 0.72, 0.22));
-  cake.add(at(ball(0.035, M.leaf, 1.3, 0.4, 1.3, true), -0.3, 0.795, 0.22));
+  cake.add(at(flame, 0, 1.47, 0));
+  const glow = ball(0.13, M.glow, 1, 1.2, 1, true);
+  cake.add(at(glow, 0, 1.47, 0));
+  for (const [x, y, z] of [[0.2, 0.92, 0.2], [-0.3, 0.72, 0.22], [0.34, 0.68, -0.05]] as const) {
+    cake.add(at(outlined(ball(0.07, M.berry, 1, 1.1, 1, true)), x, y, z));
+    cake.add(at(ball(0.035, M.leaf, 1.3, 0.4, 1.3, true), x, y + 0.075, z));
+  }
   scene.add(cake);
 
   /* bóng đổ mềm dưới chân */
@@ -456,23 +418,6 @@ export function createMocheeStage(canvas: HTMLCanvasElement): MocheeStage {
     legR.b.rotation.x = p.kR * DEG;
   }
 
-  function poseAt(p: number, t: number): Pose {
-    const ph = p * Math.PI * 2 * 30; // ~30 nhịp tay chân cho cả hành trình
-    const kick = ph + t * 2.2; // lúc nằm thì tay chân tự đạp nhẹ
-
-    const fRoll = smooth(0.045, 0.16, p);
-    let pose = mix(supine(kick, t), prone(kick, t), fRoll);
-    // lật: xoay quanh sống lưng, hơi nhổm người lên ở giữa cú lật
-    pose.roll = -180 * (1 - fRoll);
-    pose.y += 0.05 * sin(Math.PI * fRoll);
-    pose = mix(pose, commando(ph), smooth(0.17, 0.235, p));
-    pose = mix(pose, crawl(ph), smooth(0.36, 0.44, p));
-    pose = mix(pose, stand(t), smooth(0.58, 0.69, p));
-    pose = mix(pose, walk(ph * 0.8), smooth(0.79, 0.85, p));
-    pose = mix(pose, cheer(t), smooth(0.955, 0.99, p));
-    return pose;
-  }
-
   let disposed = false;
 
   return {
@@ -496,10 +441,10 @@ export function createMocheeStage(canvas: HTMLCanvasElement): MocheeStage {
       if (disposed) return;
       const p = clamp01(progress);
       const pose = poseAt(p, time);
-      apply(pose);
 
       const { xStart, xEnd, xCake } = path();
       const x = lerp(xStart, xEnd, p);
+      apply(pose);
       root.position.set(x, 0, 0.15);
 
       // thở nhẹ + chớp mắt để bé luôn "sống"
@@ -534,6 +479,7 @@ export function createMocheeStage(canvas: HTMLCanvasElement): MocheeStage {
       cakeShadow.position.set(xCake, 0.004, -0.02);
       const fl = 1 + 0.12 * sin(time * 11) + 0.06 * sin(time * 23);
       flame.scale.set(0.05 * 0.8, 0.05 * 1.35 * fl, 0.05 * 0.8);
+      glow.scale.setScalar(0.13 * (0.95 + 0.1 * fl));
       const wobble = smooth(0.955, 0.99, p) * 0.03 * sin(time * 8.4);
       cake.scale.set(1 + wobble, 1 - wobble, 1 + wobble);
 

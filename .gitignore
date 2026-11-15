@@ -9,3 +9,6 @@ data/*.db-*
 *.tsbuildinfo
 next-env.d.ts
 .DS_Store
+
+# file tạm, không đưa lên git
+_to_delete/

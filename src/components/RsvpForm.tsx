@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useId, useState } from 'react';
+import { Dango } from './Bakery';
 import { Duck, Icon } from './Decor';
 import { site } from '@/lib/site';
 
@@ -75,6 +76,7 @@ export default function RsvpForm() {
 
   return (
     <section className="card rsvp" id="xac-nhan" aria-labelledby="rsvp-title">
+      <Dango className="card__sticker card__sticker--dango" />
       <p className="eyebrow">Giữ chỗ tại tiệm</p>
       <h2 id="rsvp-title" className="card__title">
         Xác nhận tham dự
@@ -104,6 +106,7 @@ export default function RsvpForm() {
         <form className="form" onSubmit={submit} noValidate>
           <p className="form__lead">Cho ba mẹ Mochee biết bạn sẽ ghé để chuẩn bị bàn tiệc thật chu đáo nhé.</p>
 
+          <div className="form__row">
           <div className="field">
             <label htmlFor={`${id}-name`}>Tên của bạn / gia đình</label>
             <input
@@ -141,6 +144,7 @@ export default function RsvpForm() {
               </button>
               <span className="stepper__unit">người (tính cả bé nhỏ)</span>
             </div>
+          </div>
           </div>
 
           <div className="field">

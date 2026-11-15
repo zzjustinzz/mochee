@@ -73,7 +73,7 @@ export default function AdminPage() {
     const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'khach-thoi-noi-mochee.csv';
+    a.download = 'khach-sinh-nhat-mochee.csv';
     a.click();
     URL.revokeObjectURL(url);
   }

@@ -4,7 +4,7 @@ import '@fontsource-variable/quicksand';
 import './globals.css';
 import { site } from '@/lib/site';
 
-const title = `Thôi nôi bé ${site.nickname} · ${site.partyTimeLabel} – 22.11.2026`;
+const title = `Sinh nhật 1 tuổi bé ${site.nickname} · ${site.partyTimeLabel} – 22.11.2026`;
 const description = `${site.shopName} mở cửa mừng bé ${site.babyFullName} tròn 1 tuổi. Mời bạn ghé ${site.venue.name} (${site.venue.hall}) lúc ${site.partyTimeLabel}, ${site.partyDateLabel}.`;
 
 const siteUrl =

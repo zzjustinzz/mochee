@@ -1,3 +1,4 @@
+import { Cupcake } from './Bakery';
 import { Icon } from './Decor';
 import { links, site } from '@/lib/site';
 
@@ -5,10 +6,14 @@ import { links, site } from '@/lib/site';
 export default function PartyInfo() {
   return (
     <section className="card ticket" id="tiec" aria-labelledby="tiec-title">
+      <Cupcake className="card__sticker" />
       <p className="eyebrow">Phiếu hẹn</p>
       <h2 id="tiec-title" className="card__title">
-        Tiệc thôi nôi bé {site.babyName}
+        Tiệc sinh nhật bé {site.babyName}
       </h2>
+
+      <div className="ticket__body">
+      <div className="ticket__info">
 
       <dl className="ticket__rows">
         <div className="ticket__row">
@@ -46,6 +51,8 @@ export default function PartyInfo() {
         Dùng lịch iPhone / Outlook? <a href={links.ics}>Tải file lịch (.ics)</a>
       </p>
 
+      </div>
+
       <div className="map">
         <iframe
           title={`Bản đồ đường tới ${site.venue.name}`}
@@ -54,6 +61,7 @@ export default function PartyInfo() {
           referrerPolicy="no-referrer-when-downgrade"
           allowFullScreen
         />
+      </div>
       </div>
     </section>
   );

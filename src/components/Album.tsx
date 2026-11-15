@@ -3,10 +3,11 @@
 import { useMemo, useState } from 'react';
 import { albumPhotos } from '@/lib/album';
 import { site } from '@/lib/site';
+import { Strawberry } from './Bakery';
 import { Icon } from './Decor';
 import { useLightbox } from './Lightbox';
 
-const PAGE = 9;
+const PAGE = 12;
 
 /** Ảnh lấy thêm từ album Shotpik của bé (tải thẳng từ Shotpik, không chiếm dung lượng dự án). */
 export default function Album() {
@@ -23,11 +24,12 @@ export default function Album() {
 
   return (
     <section className="card album" id="album" aria-labelledby="album-title">
+      <Strawberry className="card__sticker" />
       <p className="eyebrow">Tủ kính trưng bày</p>
       <h2 id="album-title" className="card__title">
         Album ảnh của Mochee
       </h2>
-      <p className="album__lead">Thêm vài khoảnh khắc hậu trường trong buổi chụp ảnh thôi nôi. Bấm vào ảnh để xem lớn.</p>
+      <p className="album__lead">Thêm vài khoảnh khắc hậu trường trong buổi chụp ảnh sinh nhật. Bấm vào ảnh để xem lớn.</p>
 
       {visible.length > 0 && (
         <ul className="album__grid">

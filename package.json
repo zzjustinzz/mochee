@@ -2,7 +2,7 @@
   "name": "mochee-first-birthday",
   "version": "1.0.0",
   "private": true,
-  "description": "Thiệp mời thôi nôi bé Mochee (Trần Đặng An Vy) – tiệm bánh Mochi",
+  "description": "Thiệp mời sinh nhật 1 tuổi bé Mochee (Trần Đặng An Vy) – tiệm bánh Mochi",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

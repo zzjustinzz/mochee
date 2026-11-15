@@ -38,7 +38,7 @@ export default function Countdown() {
 
   return (
     <div className="countdown">
-      <p className="countdown__label">Mẻ bánh thôi nôi sẽ ra lò sau</p>
+      <p className="countdown__label">Mẻ bánh sinh nhật sẽ ra lò sau</p>
       <ol
         className="countdown__units"
         role="timer"
