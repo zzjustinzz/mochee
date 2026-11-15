@@ -1,0 +1,31 @@
+{
+  "name": "mochee-first-birthday",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Thiệp mời thôi nôi bé Mochee (Trần Đặng An Vy) – tiệm bánh Mochi",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "engines": {
+    "node": ">=20.9"
+  },
+  "dependencies": {
+    "@fontsource-variable/baloo-2": "^5.3.0",
+    "@fontsource-variable/quicksand": "^5.3.0",
+    "@libsql/client": "^0.18.0",
+    "next": "^16.4.6",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "server-only": "^0.0.1",
+    "three": "^0.187.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@types/three": "^0.187.0",
+    "typescript": "^5.9.0"
+  }
+}
