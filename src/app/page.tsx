@@ -1,5 +1,4 @@
 import Countdown from '@/components/Countdown';
-import GuessGame from '@/components/GuessGame';
 import { CakeStand, Strawberry } from '@/components/Bakery';
 import { Duck, Mochi, Sparkle } from '@/components/Decor';
 import Intro from '@/components/Intro';
@@ -39,7 +38,6 @@ export default function Page() {
             <nav className="topbar__nav" aria-label="Đi nhanh tới">
               <a href="#tiec">Tiệc</a>
               <a href="#xac-nhan">Xác nhận</a>
-              <a href="#doan">Đoán</a>
               <a href="#loi-chuc">Lời chúc</a>
             </nav>
             <MusicButton />
@@ -114,7 +112,6 @@ export default function Page() {
 
           <div className="panel__b">
             <RsvpForm />
-            <GuessGame />
             <Wishes />
 
             <footer className="footer">

@@ -4,8 +4,8 @@ Trang mời dự tiệc sinh nhật đầu tiên của bé **Trần Đặng An V
 
 - **Mở đầu:** mặt tiền tiệm bánh mochi, chạm vào cửa thì cửa mở và "bước vào" trang.
 - **Cột trái (hẹp, kiểu bếp bánh):** thanh treo dụng cụ, 20 tấm ảnh xếp dọc xen đồ làm bánh (phới, cây cán bột, túi bắt kem, cupcake, dango, vịt con…). Trên quầy bánh dính ở đáy màn hình có bé Mochee 3D (hoạt hình, viền sticker), cuộn tới đâu bé lớn tới đó: lật → trườn → bò → đứng → đi, tới chiếc bánh có nến số 1.
-- **Cột phải (phần chính):** dây cờ, ảnh cận mặt bé trên đĩa bánh, "Tiệc sinh nhật đầu tiên của Mochee", đếm ngược, phiếu hẹn kèm bản đồ OpenStreetMap (kéo/zoom được), form xác nhận tham dự, trò "Mochee sẽ bốc món nào?", sổ lời chúc, nút gửi thiệp cho bạn bè.
-- **Điện thoại:** tự xếp thành một cột (thiệp mời → hành trình ảnh → xác nhận, trò đoán, lời chúc).
+- **Cột phải (phần chính):** dây cờ, ảnh cận mặt bé trên đĩa bánh, "Tiệc sinh nhật đầu tiên của Mochee", đếm ngược, phiếu hẹn kèm bản đồ OpenStreetMap (kéo/zoom được), form xác nhận tham dự, sổ lời chúc, nút gửi thiệp cho bạn bè.
+- **Điện thoại:** tự xếp thành một cột (thiệp mời → hành trình ảnh → xác nhận, lời chúc).
 - **Nhạc nền hộp nhạc:** bắt đầu khi khách chạm mở cửa tiệm, bật/tắt bằng nút nốt nhạc trên thanh điều hướng (nhớ lựa chọn cho lần sau).
 - **Thổi nến:** khi bé đi tới bánh, bấm bong bóng "Thổi nến giúp Mochee nha!" để tắt nến, kèm pháo giấy (xác nhận tham dự và gửi lời chúc cũng có pháo giấy).
 - **`/admin`:** trang riêng cho ba mẹ xem danh sách khách, tải CSV, xoá lời chúc không phù hợp.
@@ -65,7 +65,6 @@ Nếu dữ liệu "biến mất" sau khi gắn Turso:
 | Tên bé, ngày giờ, địa điểm | `src/lib/site.ts` |
 | File lịch tải về | `public/sinh-nhat-mochee.ics` (giờ ghi theo UTC) |
 | Danh sách 20 ảnh, tên các "mẻ bánh", mô tả ảnh | `src/lib/photos.ts` |
-| Các món trong trò "Mochee sẽ bốc món nào?" | `src/lib/guess.ts` (hình vẽ ở `src/components/Bakery.tsx`) |
 | Nhạc nền | thay file `public/music/mochee-music-box.mp3` (giữ nguyên tên). Bản hiện tại do `scripts/compose-music.py` tổng hợp: giai điệu tự sáng tác + Happy Birthday (giai điệu 1893, phạm vi công cộng) |
 | Lời mời, tiêu đề | `src/app/page.tsx` |
 | Màu sắc, cỡ chữ | biến `--…` ở đầu `src/app/globals.css` |
@@ -95,12 +94,11 @@ src/
     admin/page.tsx      trang quản trị
     api/rsvp/           POST xác nhận tham dự · GET tổng số khách
     api/wishes/         GET/POST lời chúc (phân trang)
-    api/guess/          GET/POST trò đoán Mochee bốc món nào
     api/health/         Kiểm tra dữ liệu đang lưu ở Turso hay bộ nhớ tạm
     api/admin/          GET toàn bộ dữ liệu · DELETE một dòng (cần ADMIN_KEY)
-  components/           Intro, Journey, BabyStage, Countdown, PartyInfo, VenueMap, RsvpForm, GuessGame, Wishes,
+  components/           Intro, Journey, BabyStage, Countdown, PartyInfo, VenueMap, RsvpForm, Wishes,
                         MusicButton, ShareButton, Lightbox, Decor (vịt, mochi, icon), Bakery (đồ làm bánh SVG)
-  lib/                  site, photos, db (SQLite), guard (chống spam), music, confetti, guess, flavors
+  lib/                  site, photos, db (SQLite), guard (chống spam), music, confetti, flavors
   three/                mocheeStage (bé 3D + vịt + bánh), poses (tư thế), milestones
 public/                 ảnh, ảnh chia sẻ og.jpg, file lịch .ics
 ```
@@ -110,7 +108,6 @@ public/                 ảnh, ảnh chia sẻ og.jpg, file lịch .ics
 ```sql
 rsvps   (id, name, guests 1–20, note, created_at)
 wishes  (id, name, message, flavor, created_at)
-guesses (id, item, created_at)   -- trò đoán món
 ```
 
 - Dữ liệu gửi lên được cắt độ dài, bỏ ký tự điều khiển và luôn ghi bằng câu lệnh có tham số.
