@@ -29,7 +29,7 @@ export const site = {
 const mapQuery = `${site.venue.name}, A12 Phan Văn Trị, Hạnh Thông, Hồ Chí Minh`;
 
 export const links = {
-  mapEmbed: `https://www.google.com/maps?q=${encodeURIComponent(mapQuery)}&ll=${site.venue.lat},${site.venue.lng}&z=16&hl=vi&output=embed`,
+  place: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery)}&query_place_id=${site.venue.placeId}`,
   directions: `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(mapQuery)}&destination_place_id=${site.venue.placeId}`,
   googleCalendar:
     'https://calendar.google.com/calendar/render?action=TEMPLATE' +

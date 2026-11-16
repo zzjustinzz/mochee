@@ -1,5 +1,6 @@
 import { Cupcake } from './Bakery';
 import { Icon } from './Decor';
+import VenueMap from './VenueMap';
 import { links, site } from '@/lib/site';
 
 /** Phiếu hẹn: thời gian, địa điểm, chỉ đường và bản đồ. */
@@ -53,15 +54,7 @@ export default function PartyInfo() {
 
       </div>
 
-      <div className="map">
-        <iframe
-          title={`Bản đồ đường tới ${site.venue.name}`}
-          src={links.mapEmbed}
-          loading="lazy"
-          referrerPolicy="no-referrer-when-downgrade"
-          allowFullScreen
-        />
-      </div>
+      <VenueMap />
       </div>
     </section>
   );
