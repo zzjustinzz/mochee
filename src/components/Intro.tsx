@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { Duck, Mochi, Sparkle } from './Decor';
+import { musicMutedByGuest, playMusic } from '@/lib/music';
 import { site } from '@/lib/site';
 
 type Phase = 'closed' | 'opening' | 'gone';
@@ -13,6 +14,12 @@ export default function Intro() {
   const openDoors = useCallback(() => {
     setPhase((p) => (p === 'closed' ? 'opening' : p));
   }, []);
+
+  /** khách tự chạm vào cửa -> mở cửa kèm tiếng hộp nhạc (trình duyệt cho phép phát vì có cú chạm) */
+  const openByGuest = useCallback(() => {
+    if (!musicMutedByGuest()) void playMusic(false);
+    openDoors();
+  }, [openDoors]);
 
   // khoá cuộn khi cửa còn đóng
   useEffect(() => {
@@ -72,7 +79,7 @@ export default function Intro() {
             </div>
           </div>
 
-          <button type="button" className="shop__doorway" onClick={openDoors} aria-label="Mở cửa tiệm bánh">
+          <button type="button" className="shop__doorway" onClick={openByGuest} aria-label="Mở cửa tiệm bánh">
             <span className="shop__glow" aria-hidden="true" />
             <span className="shop__welcome" aria-hidden="true">
               Mời vào!
@@ -110,7 +117,7 @@ export default function Intro() {
       </div>
 
       <p className="intro__hint">
-        <span>Chạm vào cửa để ghé tiệm</span>
+        <span>Chạm vào cửa để ghé tiệm ♪</span>
       </p>
     </div>
   );

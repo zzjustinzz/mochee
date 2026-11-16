@@ -13,6 +13,8 @@ export type MocheeStage = {
   frame(progress: number, time: number): void;
   /** Điểm ngay bên trái đầu bé lúc về đích, tính theo tỉ lệ 0–1 của khung (để đặt bong bóng thoại). */
   anchor(): { x: number; y: number };
+  /** Thổi tắt nến trên bánh (tự thắp lại sau vài giây). */
+  blowCandle(): void;
   dispose(): void;
 };
 
@@ -376,6 +378,14 @@ export function createMocheeStage(canvas: HTMLCanvasElement): MocheeStage {
   cake.add(at(flame, 0, 1.47, 0));
   const glow = ball(0.13, M.glow, 1, 1.2, 1, true);
   cake.add(at(glow, 0, 1.47, 0));
+  // khói nhỏ khi thổi nến
+  const smokeMat = flat(0xd9d2c8, { transparent: true, opacity: 0, depthWrite: false });
+  const smoke = [0, 1, 2].map((k) => {
+    const puff = ball(0.05 + k * 0.012, smokeMat, 1, 1, 1, true);
+    cake.add(at(puff, 0, 1.45, 0));
+    return puff;
+  });
+  let blownAt = -Infinity;
   for (const [x, y, z] of [[0.2, 0.92, 0.2], [-0.3, 0.72, 0.22], [0.34, 0.68, -0.05]] as const) {
     cake.add(at(outlined(ball(0.07, M.berry, 1, 1.1, 1, true)), x, y, z));
     cake.add(at(ball(0.035, M.leaf, 1.3, 0.4, 1.3, true), x, y + 0.075, z));
@@ -437,6 +447,10 @@ export function createMocheeStage(canvas: HTMLCanvasElement): MocheeStage {
       return { x: (v.x + 1) / 2, y: (1 - v.y) / 2 };
     },
 
+    blowCandle() {
+      blownAt = performance.now() / 1000;
+    },
+
     frame(progress, time) {
       if (disposed) return;
       const p = clamp01(progress);
@@ -480,6 +494,17 @@ export function createMocheeStage(canvas: HTMLCanvasElement): MocheeStage {
       const fl = 1 + 0.12 * sin(time * 11) + 0.06 * sin(time * 23);
       flame.scale.set(0.05 * 0.8, 0.05 * 1.35 * fl, 0.05 * 0.8);
       glow.scale.setScalar(0.13 * (0.95 + 0.1 * fl));
+      // nến tắt ~6 giây sau khi thổi, có làn khói nhỏ bay lên
+      const since = performance.now() / 1000 - blownAt;
+      const out = since >= 0 && since < 6;
+      flame.visible = glow.visible = !out;
+      const puffT = since >= 0 && since < 1.8 ? since / 1.8 : -1;
+      smokeMat.opacity = puffT >= 0 ? 0.7 * (1 - puffT) : 0;
+      smoke.forEach((pf, k) => {
+        const tt = Math.max(0, puffT - k * 0.12);
+        pf.position.set(0.04 * sin(tt * 9 + k), 1.45 + tt * (0.5 + k * 0.15), 0);
+        pf.scale.setScalar((0.05 + k * 0.012) * (1 + tt * 2));
+      });
       const wobble = smooth(0.955, 0.99, p) * 0.03 * sin(time * 8.4);
       cake.scale.set(1 + wobble, 1 - wobble, 1 + wobble);
 

@@ -57,6 +57,11 @@ export function dbInfo() {
 export const isEphemeralDb = () => resolve().mode === 'vercel-tmp';
 
 const SCHEMA = [
+  `CREATE TABLE IF NOT EXISTS guesses (
+     id         INTEGER PRIMARY KEY AUTOINCREMENT,
+     item       TEXT NOT NULL,
+     created_at TEXT NOT NULL
+   )`,
   `CREATE TABLE IF NOT EXISTS rsvps (
      id         INTEGER PRIMARY KEY AUTOINCREMENT,
      name       TEXT    NOT NULL,

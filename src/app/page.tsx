@@ -1,9 +1,11 @@
-import Album from '@/components/Album';
 import Countdown from '@/components/Countdown';
+import GuessGame from '@/components/GuessGame';
 import { CakeStand, Strawberry } from '@/components/Bakery';
 import { Duck, Mochi, Sparkle } from '@/components/Decor';
 import Intro from '@/components/Intro';
 import Journey from '@/components/Journey';
+import MusicButton from '@/components/MusicButton';
+import ShareButton from '@/components/ShareButton';
 import { LightboxProvider } from '@/components/Lightbox';
 import PartyInfo from '@/components/PartyInfo';
 import RsvpForm from '@/components/RsvpForm';
@@ -37,9 +39,10 @@ export default function Page() {
             <nav className="topbar__nav" aria-label="Đi nhanh tới">
               <a href="#tiec">Tiệc</a>
               <a href="#xac-nhan">Xác nhận</a>
+              <a href="#doan">Đoán</a>
               <a href="#loi-chuc">Lời chúc</a>
-              <a href="#album">Album</a>
             </nav>
+            <MusicButton />
           </header>
 
           <div className="panel__a">
@@ -111,8 +114,8 @@ export default function Page() {
 
           <div className="panel__b">
             <RsvpForm />
+            <GuessGame />
             <Wishes />
-            <Album />
 
             <footer className="footer">
               <div className="footer__ducks" aria-hidden="true">
@@ -125,6 +128,9 @@ export default function Page() {
                 Cảm ơn bạn đã ghé <strong>{site.shopName}</strong>.
               </p>
               <p>Thương gửi từ ba mẹ và bé {site.babyName}.</p>
+              <div className="footer__share">
+                <ShareButton />
+              </div>
             </footer>
           </div>
         </aside>

@@ -3,7 +3,9 @@
 import { useEffect, useId, useState } from 'react';
 import { Dango } from './Bakery';
 import { Duck, Icon } from './Decor';
+import { confettiFrom } from '@/lib/confetti';
 import { site } from '@/lib/site';
+import ShareButton from './ShareButton';
 
 type Saved = { name: string; guests: number };
 const KEY = 'mochee:rsvp';
@@ -62,6 +64,7 @@ export default function RsvpForm() {
       const s = { name: cleanName, guests };
       setSaved(s);
       setStatus('done');
+      confettiFrom(document.getElementById('xac-nhan'));
       setTotal((t) => (t ?? 0) + guests);
       try {
         localStorage.setItem(KEY, JSON.stringify(s));
@@ -90,6 +93,7 @@ export default function RsvpForm() {
             Tiệm chuẩn bị <strong>{saved.guests} chỗ ngồi</strong>. Hẹn gặp lúc {site.partyTimeLabel},{' '}
             {site.partyDateLabel} tại {site.venue.hall}.
           </p>
+          <ShareButton label="Rủ thêm bạn bè đến tiệc" />
           <button
             type="button"
             className="link-btn"

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useId, useState } from 'react';
 import { PipingBag } from './Bakery';
 import { Icon, Mochi } from './Decor';
+import { confettiFrom } from '@/lib/confetti';
 import { flavors, type FlavorKey } from '@/lib/flavors';
 
 type Wish = { id: number; name: string; message: string; flavor: string; createdAt: string };
@@ -92,6 +93,7 @@ export default function Wishes() {
       }
       setMessage('');
       setThanks(true);
+      confettiFrom(document.querySelector('#loi-chuc .wishes__list-head'), 70);
       window.setTimeout(() => setThanks(false), 6000);
       try {
         localStorage.setItem(NAME_KEY, cleanName);

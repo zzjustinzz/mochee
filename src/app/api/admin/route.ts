@@ -28,12 +28,14 @@ export async function GET(req: Request) {
   if (blocked) return blocked;
   try {
     const client = await db();
-    const [rsvps, wishes] = await Promise.all([
+    const [rsvps, wishes, guesses] = await Promise.all([
       client.execute('SELECT id, name, guests, note, created_at FROM rsvps ORDER BY id DESC'),
       client.execute('SELECT id, name, message, flavor, created_at FROM wishes ORDER BY id DESC'),
+      client.execute('SELECT item, COUNT(*) AS n FROM guesses GROUP BY item ORDER BY n DESC'),
     ]);
     return json({
       ephemeral: isEphemeralDb(),
+      guesses: guesses.rows.map((r) => ({ item: String(r.item), n: Number(r.n) })),
       storage: dbInfo(),
       rsvps: rsvps.rows.map((r) => ({
         id: Number(r.id),

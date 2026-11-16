@@ -22,8 +22,6 @@ export const site = {
     placeId: 'ChIJ_a_RXPkodTERXMy4Lt5CiKo',
   },
 
-  albumUrl: 'https://shotpik.com/albums/01a1ab50-02c2-7026-9d88-a53f11cb2517',
-  albumTotal: 401,
 } as const;
 
 const mapQuery = `${site.venue.name}, A12 Phan Văn Trị, Hạnh Thông, Hồ Chí Minh`;

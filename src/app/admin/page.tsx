@@ -1,10 +1,11 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import { GUESS_ITEMS } from '@/lib/guess';
 
 type Rsvp = { id: number; name: string; guests: number; note: string; createdAt: string };
 type Wish = { id: number; name: string; message: string; flavor: string; createdAt: string };
-type Data = { rsvps: Rsvp[]; wishes: Wish[]; ephemeral: boolean; storage?: { mode: string; envVar: string; host: string; hasToken: boolean } };
+type Data = { rsvps: Rsvp[]; wishes: Wish[]; guesses?: { item: string; n: number }[]; ephemeral: boolean; storage?: { mode: string; envVar: string; host: string; hasToken: boolean } };
 
 const KEY = 'mochee:admin-key';
 const fmt = (iso: string) =>
@@ -179,6 +180,17 @@ export default function AdminPage() {
               </tbody>
             </table>
           </div>
+
+          {!!data.guesses?.length && (
+            <>
+              <h2>Khách đoán Mochee bốc món gì</h2>
+              <p className="admin__note">
+                {data.guesses
+                  .map((g) => `${GUESS_ITEMS.find((x) => x.key === g.item)?.item ?? g.item}: ${g.n}`)
+                  .join(' · ')}
+              </p>
+            </>
+          )}
 
           <h2>Lời chúc</h2>
           <div className="admin__table-wrap">

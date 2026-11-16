@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { MILESTONES, milestoneIndex } from '@/three/milestones';
 import { Duck } from './Decor';
+import { confettiFrom } from '@/lib/confetti';
 
 type Props = {
   /** phần tử bao toàn bộ hành trình (để biết lúc nào cuộn tới cuối) */
@@ -18,10 +19,12 @@ type Props = {
 export default function BabyStage({ sectionRef, trackRef }: Props) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const bubbleRef = useRef<HTMLParagraphElement>(null);
+  const bubbleRef = useRef<HTMLButtonElement>(null);
   const [step, setStep] = useState(0);
   const [arrived, setArrived] = useState(false);
   const [failed, setFailed] = useState(false);
+  const [blown, setBlown] = useState(false);
+  const stageRef = useRef<import('@/three/mocheeStage').MocheeStage | null>(null);
 
   useEffect(() => {
     const wrap = wrapRef.current;
@@ -92,6 +95,7 @@ export default function BabyStage({ sectionRef, trackRef }: Props) {
       .then(({ createMocheeStage }) => {
         if (!alive) return;
         stage = createMocheeStage(canvas);
+        stageRef.current = stage;
         fit();
         ro.observe(wrap);
         io.observe(wrap);
@@ -120,9 +124,21 @@ export default function BabyStage({ sectionRef, trackRef }: Props) {
     >
       <div className="stage__counter" aria-hidden="true" />
       {failed ? <Duck className="stage__fallback" /> : <canvas ref={canvasRef} className="stage__canvas" aria-hidden="true" />}
-      <p ref={bubbleRef} className="stage__bubble" aria-hidden="true">
-        Tròn 1 tuổi rồi nè!
-      </p>
+      <button
+        ref={bubbleRef}
+        type="button"
+        className="stage__bubble"
+        tabIndex={arrived ? 0 : -1}
+        aria-hidden={!arrived}
+        onClick={(e) => {
+          stageRef.current?.blowCandle();
+          confettiFrom(e.currentTarget, 80);
+          setBlown(true);
+          window.setTimeout(() => setBlown(false), 6000);
+        }}
+      >
+        {blown ? 'Chúc mừng sinh nhật Mochee!' : 'Thổi nến giúp Mochee nha!'}
+      </button>
       <ol className="stage__steps" aria-hidden="true">
         {MILESTONES.map((m, i) => (
           <li key={m.key} className={i === step ? 'is-on' : i < step ? 'is-done' : undefined}>
