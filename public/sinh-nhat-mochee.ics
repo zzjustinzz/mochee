@@ -9,9 +9,9 @@ DTSTAMP:20261115T000000Z
 DTSTART:20261122T103000Z
 DTEND:20261122T140000Z
 SUMMARY:Sinh nhật 1 tuổi bé Mochee (An Vy)
-LOCATION:Nhà hàng Hương Phố - Sảnh Grand Ruby\, A12 Đường Phan Văn Trị\, Phường Hạnh Thông\, TP. Hồ Chí Minh
+LOCATION:Nhà hàng The Chateau - Sảnh Grand Ruby\, 26 Đường Phan Văn Trị\, Phường Hạnh Thông\, TP. Hồ Chí Minh
 DESCRIPTION:Tiệc sinh nhật đầu tiên của bé Trần Đặng An Vy - 17:30 Chủ nhật 22/11/2026 tại sảnh Grand Ruby.
-GEO:10.8287013;106.6833645
+GEO:10.8291893;106.6834101
 BEGIN:VALARM
 TRIGGER:-PT3H
 ACTION:DISPLAY

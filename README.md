@@ -1,6 +1,6 @@
 # Tiệm bánh Mochee – thiệp mời sinh nhật 1 tuổi bé An Vy
 
-Trang mời dự tiệc sinh nhật đầu tiên của bé **Trần Đặng An Vy (Mochee)** – 17:30, Chủ nhật 22/11/2026, Nhà hàng Hương Phố (sảnh Grand Ruby).
+Trang mời dự tiệc sinh nhật đầu tiên của bé **Trần Đặng An Vy (Mochee)** – 17:30, Chủ nhật 22/11/2026, Nhà hàng The Chateau – 26 Phan Văn Trị (sảnh Grand Ruby).
 
 - **Mở đầu:** mặt tiền tiệm bánh mochi, chạm vào cửa thì cửa mở và "bước vào" trang.
 - **Cột trái (hẹp, kiểu bếp bánh):** thanh treo dụng cụ, 20 tấm ảnh xếp dọc xen đồ làm bánh (phới, cây cán bột, túi bắt kem, cupcake, dango, vịt con…). Trên quầy bánh dính ở đáy màn hình có bé Mochee 3D (hoạt hình, viền sticker), cuộn tới đâu bé lớn tới đó: lật → trườn → bò → đứng → đi, tới chiếc bánh có nến số 1.

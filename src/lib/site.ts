@@ -14,17 +14,17 @@ export const site = {
   partyDateLabel: 'Chủ nhật, 22 · 11 · 2026',
 
   venue: {
-    name: 'Nhà hàng Hương Phố',
+    name: 'Nhà hàng The Chateau',
     hall: 'Sảnh Grand Ruby',
-    address: 'A12 Đường Phan Văn Trị, Phường Hạnh Thông, TP. Hồ Chí Minh',
-    lat: 10.8287013,
-    lng: 106.6833645,
-    placeId: 'ChIJ_a_RXPkodTERXMy4Lt5CiKo',
+    address: '26 Đường Phan Văn Trị, Phường Hạnh Thông, TP. Hồ Chí Minh',
+    lat: 10.8291893,
+    lng: 106.6834101,
+    placeId: 'ChIJ96hkpvAodTERpTQy4riT5O0',
   },
 
 } as const;
 
-const mapQuery = `${site.venue.name}, A12 Phan Văn Trị, Hạnh Thông, Hồ Chí Minh`;
+const mapQuery = 'Nhà Hàng Tiệc Cưới The Chateau, 26 Phan Văn Trị, Hạnh Thông, Hồ Chí Minh';
 
 export const links = {
   place: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery)}&query_place_id=${site.venue.placeId}`,
