@@ -90,8 +90,8 @@ export default function Page() {
                     bé <strong>{site.babyFullName}</strong>
                   </p>
                   <p className="hero__invite">
-                    Chiếc bánh mochi ngọt ngào nhất của ba mẹ đã tròn một năm «ra lò». Ba mẹ thân mời cô chú, anh chị và
-                    các bạn nhỏ đến chung vui ngày sinh nhật đầu tiên của bé {site.babyName}.
+                    Chiếc bánh mochi ngọt ngào nhất của ba mẹ đã tròn một năm «ra lò». Ba mẹ thân mời ông bà, cô chú, anh chị
+                    và các bạn nhỏ đến chung vui ngày sinh nhật đầu tiên của bé {site.babyName}.
                   </p>
                   <div className="hero__cta">
                     <a className="btn btn--primary" href="#xac-nhan">

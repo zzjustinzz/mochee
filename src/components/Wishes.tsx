@@ -125,7 +125,7 @@ export default function Wishes() {
             onChange={(e) => setName(e.target.value)}
             maxLength={60}
             autoComplete="name"
-            placeholder="Cô, chú, dì, bác…"
+            placeholder="Ông, bà, cô, chú, dì, bác…"
             required
           />
         </div>

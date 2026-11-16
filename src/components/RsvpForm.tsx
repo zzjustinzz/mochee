@@ -120,7 +120,7 @@ export default function RsvpForm() {
               onChange={(e) => setName(e.target.value)}
               maxLength={60}
               autoComplete="name"
-              placeholder="Ví dụ: Gia đình cô Lan"
+              placeholder="Ví dụ: Ông bà ngoại, gia đình cô Lan"
               required
               aria-invalid={!!error && !name.trim()}
             />
